@@ -1,7 +1,13 @@
 import { BookingForm } from "@/components/booking-form";
 import { SectionHeading } from "@/components/section-heading";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Book an Appointment" };
+export const metadata = createPageMetadata({
+  title: "Book an Appointment",
+  description:
+    "Request a preferred branch, facial-care service, date and time. Appointments remain subject to branch confirmation.",
+  path: "/book",
+});
 
 export default function BookPage() {
   return (

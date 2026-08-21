@@ -1,6 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { branches, services, testimonials } from "@/lib/data";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: "Premium Facial Care in the Philippines",
+  description:
+    "Explore services, branches, promotions and appointment requests from The Executive Facial Care in the Philippines.",
+  path: "/",
+});
 
 const websiteReasons = [
   ["◇", "Clear service information", "Approved details can be kept in one easy-to-browse catalog."],

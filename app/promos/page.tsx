@@ -1,8 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "@/components/section-heading";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Promos" };
+export const metadata = createPageMetadata({
+  title: "Promotions",
+  description:
+    "Explore The Executive Facial Care promotion concept. Final dates, mechanics and participating branches require company approval.",
+  path: "/promos",
+});
 
 export default function PromosPage() {
   return (

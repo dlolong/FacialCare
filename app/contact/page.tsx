@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { SectionHeading } from "@/components/section-heading";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Contact" };
+export const metadata = createPageMetadata({
+  title: "Contact",
+  description:
+    "Contact The Executive Facial Care or use the appointment request flow to connect with your preferred branch.",
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

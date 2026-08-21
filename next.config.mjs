@@ -1,6 +1,10 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-};
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants.js";
 
-export default nextConfig;
+/** @type {import('next').NextConfig} */
+export default function nextConfig(phase) {
+  return {
+    reactStrictMode: true,
+    // Keep production builds from replacing the active development cache.
+    distDir: phase === PHASE_DEVELOPMENT_SERVER ? ".next" : ".next-build",
+  };
+}

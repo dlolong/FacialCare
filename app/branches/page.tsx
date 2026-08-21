@@ -1,8 +1,14 @@
 import Link from "next/link";
 import { SectionHeading } from "@/components/section-heading";
 import { branches } from "@/lib/data";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Branches" };
+export const metadata = createPageMetadata({
+  title: "Branches",
+  description:
+    "Explore The Executive Facial Care branch directory. Official addresses, contacts and operating hours are published after company confirmation.",
+  path: "/branches",
+});
 
 export default function BranchesPage() {
   return (

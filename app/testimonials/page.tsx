@@ -1,7 +1,13 @@
 import { SectionHeading } from "@/components/section-heading";
 import { testimonials } from "@/lib/data";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Testimonials" };
+export const metadata = createPageMetadata({
+  title: "Client Testimonials",
+  description:
+    "Preview how verified and company-approved client experiences can be presented by The Executive Facial Care.",
+  path: "/testimonials",
+});
 
 export default function TestimonialsPage() {
   return (

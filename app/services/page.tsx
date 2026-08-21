@@ -2,8 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { SectionHeading } from "@/components/section-heading";
 import { services } from "@/lib/data";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata = { title: "Services" };
+export const metadata = createPageMetadata({
+  title: "Facial-Care Services",
+  description:
+    "Browse the demo facial-care service catalog from The Executive Facial Care. Final details and availability require company approval.",
+  path: "/services",
+});
 
 export default function ServicesPage() {
   return (
