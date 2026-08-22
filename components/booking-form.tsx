@@ -1,13 +1,67 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { branches, services } from "@/lib/data";
+import { publicBranches } from "@/lib/branches";
+import { serviceCategoryLabels, services } from "@/lib/services";
 
-export function BookingForm() {
+type BookingFormProps = {
+  initialBranch?: string;
+  initialService?: string;
+};
+
+type RequestData = {
+  service: string;
+  branch: string;
+  date: string;
+  time: string;
+  name: string;
+  phone: string;
+  email: string;
+  note: string;
+};
+
+const stepLabels = ["Service", "Branch", "Date", "Time", "Details", "Review", "Submit"];
+
+export function BookingForm({ initialBranch = "", initialService = "" }: BookingFormProps) {
+  const validBranch = publicBranches.some((branch) => branch.slug === initialBranch) ? initialBranch : "";
+  const validService = services.some((service) => service.slug === initialService) ? initialService : "";
+  const startingStep = validService ? (validBranch ? 3 : 2) : 1;
+  const [step, setStep] = useState(startingStep);
   const [submitted, setSubmitted] = useState(false);
+  const [request, setRequest] = useState<RequestData>({
+    service: validService,
+    branch: validBranch,
+    date: "",
+    time: "",
+    name: "",
+    phone: "",
+    email: "",
+    note: "",
+  });
+
+  const selectedService = services.find((service) => service.slug === request.service);
+  const selectedBranch = publicBranches.find((branch) => branch.slug === request.branch);
+
+  function update(field: keyof RequestData, value: string) {
+    setRequest((current) => ({ ...current, [field]: value }));
+  }
+
+  function canContinue() {
+    if (step === 1) return Boolean(request.service);
+    if (step === 2) return Boolean(request.branch);
+    if (step === 3) return Boolean(request.date);
+    if (step === 4) return Boolean(request.time);
+    if (step === 5) return Boolean(request.name.trim() && request.phone.trim());
+    return true;
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (step < 6) {
+      if (canContinue()) setStep((current) => Math.min(current + 1, 6));
+      return;
+    }
+    setStep(7);
     setSubmitted(true);
   }
 
@@ -15,87 +69,151 @@ export function BookingForm() {
     return (
       <div className="successCard" role="status">
         <span className="successIcon">✓</span>
-        <h2>Demo request received</h2>
+        <p className="eyebrow">Step 7 of 7</p>
+        <h2>Appointment Request Sent</h2>
         <p>
-          This starter does not send or store customer data yet. Connect this form to the approved
-          booking backend only after the workflow and privacy requirements are confirmed.
+          This demo does not transmit or store customer data. Your requested schedule is not an
+          appointment confirmation; the selected branch must confirm availability.
         </p>
-        <button className="button" onClick={() => setSubmitted(false)} type="button">
-          Create another demo request
+        <button
+          className="button"
+          onClick={() => { setSubmitted(false); setStep(1); }}
+          type="button"
+        >
+          Create another request
         </button>
       </div>
     );
   }
 
   return (
-    <form className="bookingForm" onSubmit={handleSubmit}>
-      <div className="fieldGrid">
-        <label>
-          Full name
-          <input name="name" required placeholder="Your name" autoComplete="name" />
-        </label>
-        <label>
-          Mobile number
-          <input name="phone" required placeholder="09xx xxx xxxx" inputMode="tel" />
-        </label>
+    <form className="bookingForm multiStepForm" onSubmit={handleSubmit}>
+      <div className="bookingProgress" aria-label={`Booking step ${step} of 7`}>
+        {stepLabels.map((label, index) => (
+          <span className={index + 1 <= step ? "active" : ""} key={label}>
+            <i>{index + 1}</i><small>{label}</small>
+          </span>
+        ))}
       </div>
 
-      <div className="fieldGrid">
-        <label>
-          Branch
-          <select name="branch" required defaultValue="">
-            <option value="" disabled>
-              Select a branch
-            </option>
-            {branches.slice(0, 2).map((branch) => (
-              <option key={branch.slug} value={branch.slug}>
-                {branch.name}, {branch.area}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Service
-          <select name="service" required defaultValue="">
-            <option value="" disabled>
-              Select a service
-            </option>
-            {services.map((service) => (
-              <option key={service.slug} value={service.slug}>
-                {service.name}
-              </option>
-            ))}
-          </select>
-        </label>
+      <div className="bookingStep">
+        <p className="eyebrow">Step {step} of 7</p>
+        {step === 1 ? (
+          <>
+            <h2>Select a service</h2>
+            <label>
+              Service
+              <select value={request.service} onChange={(event) => update("service", event.target.value)} required>
+                <option value="" disabled>Select a service</option>
+                {services.map((service) => (
+                  <option key={service.slug} value={service.slug}>
+                    {service.name} — {serviceCategoryLabels[service.category]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </>
+        ) : null}
+
+        {step === 2 ? (
+          <>
+            <h2>Select a branch</h2>
+            <label>
+              Branch
+              <select value={request.branch} onChange={(event) => update("branch", event.target.value)} required>
+                <option value="" disabled>Select a branch</option>
+                {publicBranches.map((branch) => (
+                  <option key={branch.slug} value={branch.slug}>
+                    {branch.name}, {branch.province}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="privacyNote">Service availability varies by branch and will be confirmed after submission.</p>
+          </>
+        ) : null}
+
+        {step === 3 ? (
+          <>
+            <h2>Choose a preferred date</h2>
+            <label>
+              Preferred date
+              <input value={request.date} onChange={(event) => update("date", event.target.value)} name="date" type="date" required />
+            </label>
+          </>
+        ) : null}
+
+        {step === 4 ? (
+          <>
+            <h2>Choose a preferred time</h2>
+            <label>
+              Preferred time
+              <input value={request.time} onChange={(event) => update("time", event.target.value)} name="time" type="time" required />
+            </label>
+            <p className="privacyNote">This is a preferred time only. The branch must confirm availability.</p>
+          </>
+        ) : null}
+
+        {step === 5 ? (
+          <>
+            <h2>Add your contact details</h2>
+            <div className="fieldGrid">
+              <label>
+                Full name
+                <input value={request.name} onChange={(event) => update("name", event.target.value)} name="name" required placeholder="Your name" autoComplete="name" />
+              </label>
+              <label>
+                Mobile number
+                <input value={request.phone} onChange={(event) => update("phone", event.target.value)} name="phone" required placeholder="09xx xxx xxxx" inputMode="tel" autoComplete="tel" />
+              </label>
+            </div>
+            <label>
+              Email <span className="optional">optional</span>
+              <input value={request.email} onChange={(event) => update("email", event.target.value)} name="email" type="email" autoComplete="email" placeholder="you@example.com" />
+            </label>
+            <label>
+              Appointment note <span className="optional">optional</span>
+              <textarea
+                value={request.note}
+                onChange={(event) => update("note", event.target.value)}
+                name="note"
+                rows={3}
+                placeholder="Appointment-related note only. Do not include medical or sensitive health information."
+              />
+            </label>
+          </>
+        ) : null}
+
+        {step === 6 ? (
+          <>
+            <h2>Review your request</h2>
+            <dl className="bookingReview">
+              <div><dt>Service</dt><dd>{selectedService?.name}</dd></div>
+              <div><dt>Branch</dt><dd>{selectedBranch?.name}, {selectedBranch?.province}</dd></div>
+              <div><dt>Preferred date</dt><dd>{request.date}</dd></div>
+              <div><dt>Preferred time</dt><dd>{request.time}</dd></div>
+              <div><dt>Name</dt><dd>{request.name}</dd></div>
+              <div><dt>Mobile</dt><dd>{request.phone}</dd></div>
+              {request.email ? <div><dt>Email</dt><dd>{request.email}</dd></div> : null}
+              {request.note ? <div><dt>Note</dt><dd>{request.note}</dd></div> : null}
+            </dl>
+            <p className="privacyNote">
+              Demo only — no data is transmitted or stored. Submission creates a request, not a confirmed appointment.
+            </p>
+          </>
+        ) : null}
       </div>
 
-      <div className="fieldGrid">
-        <label>
-          Preferred date
-          <input name="date" type="date" required />
-        </label>
-        <label>
-          Preferred time
-          <input name="time" type="time" required />
-        </label>
+      <div className="bookingNav">
+        {step > 1 ? (
+          <button className="button buttonOutline" type="button" onClick={() => setStep((current) => current - 1)}>
+            Back
+          </button>
+        ) : <span />}
+        <button className="button" type="submit" disabled={!canContinue()}>
+          {step === 6 ? "Submit Appointment Request" : "Continue"}
+        </button>
       </div>
-
-      <label>
-        Note <span className="optional">optional</span>
-        <textarea
-          name="note"
-          rows={4}
-          placeholder="Appointment-related note only. Avoid entering medical or sensitive health information."
-        />
-      </label>
-
-      <div className="privacyNote">
-        Demo only — no data is transmitted or stored in this starter.
-      </div>
-
-      <button className="button buttonWide" type="submit">
-        Submit Demo Appointment
-      </button>
     </form>
   );
 }

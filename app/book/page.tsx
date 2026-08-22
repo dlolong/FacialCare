@@ -9,23 +9,31 @@ export const metadata = createPageMetadata({
   path: "/book",
 });
 
-export default function BookPage() {
+type BookPageProps = {
+  searchParams: Promise<{ branch?: string | string[]; service?: string | string[] }>;
+};
+
+export default async function BookPage({ searchParams }: BookPageProps) {
+  const query = await searchParams;
+  const initialBranch = typeof query.branch === "string" ? query.branch : "";
+  const initialService = typeof query.service === "string" ? query.service : "";
+
   return (
     <section className="pageSection">
       <div className="container bookingLayout">
         <div>
           <SectionHeading
-            eyebrow="Booking prototype"
-            title="A simple appointment request flow"
-            description="For the MVP, customers can choose a branch, service, date and preferred time. Availability, confirmations and reminders can be connected in the backend phase."
+            eyebrow="Appointment request"
+            title="Request your preferred visit"
+            description="Choose a service, public branch, date and time, then review your contact details before submitting. The branch must confirm availability."
           />
           <div className="bookingSteps">
-            <span>1</span><p>Choose branch and service</p>
-            <span>2</span><p>Select preferred schedule</p>
-            <span>3</span><p>Branch confirms the appointment</p>
+            <span>1</span><p>Choose a service and public branch</p>
+            <span>2</span><p>Select your preferred schedule</p>
+            <span>3</span><p>Review and submit your request</p>
           </div>
         </div>
-        <BookingForm />
+        <BookingForm initialBranch={initialBranch} initialService={initialService} />
       </div>
     </section>
   );

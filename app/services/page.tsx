@@ -1,7 +1,6 @@
-import Image from "next/image";
-import Link from "next/link";
 import { SectionHeading } from "@/components/section-heading";
-import { services } from "@/lib/data";
+import { ServiceDirectory } from "@/components/service-directory";
+import { services } from "@/lib/services";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -17,24 +16,10 @@ export default function ServicesPage() {
       <div className="container">
         <SectionHeading
           eyebrow="Services"
-          title="A clean, searchable treatment catalog"
-          description="All descriptions shown in this starter are placeholders. Final treatment claims, pricing, duration and eligibility must be approved by the company."
+          title="Explore the service directory"
+          description="Browse categorized research seed data using neutral descriptions. Availability, suitability and final service information require branch and company confirmation."
         />
-        <div className="serviceGrid serviceGridWide">
-          {services.map((service) => (
-            <article className="serviceCard" key={service.slug}>
-              <div className="serviceImage">
-                <Image src={service.image} alt="" fill sizes="(max-width: 800px) 50vw, 33vw" />
-              </div>
-              <div className="serviceBody">
-                <span>{service.category}</span>
-                <h3>{service.name}</h3>
-                <p>{service.shortDescription}</p>
-                <Link className="textLink" href="/book">Book this service →</Link>
-              </div>
-            </article>
-          ))}
-        </div>
+        <ServiceDirectory services={services} />
       </div>
     </section>
   );

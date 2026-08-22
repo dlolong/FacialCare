@@ -1,6 +1,6 @@
-import Link from "next/link";
+import { BranchDirectory } from "@/components/branch-directory";
 import { SectionHeading } from "@/components/section-heading";
-import { branches } from "@/lib/data";
+import { publicBranches } from "@/lib/branches";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -15,29 +15,15 @@ export default function BranchesPage() {
     <section className="pageSection">
       <div className="container">
         <SectionHeading
-          eyebrow="Branch directory"
-          title="Find an Executive Facial Care branch"
-          description="This starter uses only high-level demo locations visible in the supplied materials. Replace all records with an owner-confirmed master branch list before launch."
+          eyebrow="Research branch directory"
+          title="Find an Executive Facial Care Near You"
+          description="Explore publicly listed Executive Facial Care locations. Branch details and service availability may vary."
         />
-        <div className="branchDirectory">
-          {branches.map((branch) => (
-            <article className="locationCard" key={branch.slug}>
-              <div className="locationPin">●</div>
-              <div>
-                <span className="chip">{branch.area}</span>
-                <h2>{branch.name}</h2>
-                <p>{branch.address}</p>
-                <dl>
-                  <div><dt>Phone</dt><dd>{branch.phone}</dd></div>
-                  <div><dt>Hours</dt><dd>{branch.hours}</dd></div>
-                </dl>
-                {branch.slug !== "more-branches" ? (
-                  <Link className="button buttonSmall" href="/book">Book at this branch</Link>
-                ) : null}
-              </div>
-            </article>
-          ))}
+        <div className="researchNotice">
+          <strong>Research seed data</strong>
+          <span>Locations are web-listed and still require confirmation from Head Office.</span>
         </div>
+        <BranchDirectory branches={publicBranches} />
       </div>
     </section>
   );

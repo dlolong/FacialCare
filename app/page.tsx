@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { branches, services, testimonials } from "@/lib/data";
+import { testimonials } from "@/lib/data";
+import { publicBranches } from "@/lib/branches";
+import { services } from "@/lib/services";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata = createPageMetadata({
@@ -10,13 +12,27 @@ export const metadata = createPageMetadata({
   path: "/",
 });
 
-const websiteReasons = [
-  ["◇", "Clear service information", "Approved details can be kept in one easy-to-browse catalog."],
-  ["✦", "Simple discovery", "Customers can move from services to branches without guesswork."],
-  ["✓", "Request transparency", "The booking flow clearly separates a request from confirmation."],
-  ["⌖", "Branch directory", "Confirmed locations can be managed through one official directory."],
-  ["♡", "Mobile friendly", "The experience is designed to work comfortably on smaller screens."],
+const appointmentRequestSteps = [
+  ["1", "Choose a service", "Browse the available service information before starting your request."],
+  ["2", "Select a branch", "Choose your preferred location from the public branch directory."],
+  ["3", "Share your schedule", "Provide your preferred appointment date and time in the request form."],
+  ["4", "Send your request", "Submit your basic contact and appointment details for branch review."],
+  ["5", "Wait for confirmation", "Your selected branch will contact you separately to confirm availability."],
 ] as const;
+
+const featuredServiceSlugs = [
+  "whitening-facial",
+  "carbon-laser",
+  "pico-laser",
+  "hydra-facial",
+  "diamond-peel",
+  "foot-spa",
+];
+const featuredServices = featuredServiceSlugs.flatMap((slug) => {
+  const service = services.find((item) => item.slug === slug);
+  return service ? [service] : [];
+});
+const featuredBranches = publicBranches.filter((branch) => branch.featured);
 
 export default function HomePage() {
   return (
@@ -31,7 +47,7 @@ export default function HomePage() {
               <span>Radiant Confidence</span>
             </h1>
             <p>
-              Explore facial-care services, find confirmed branch information and request your
+              Explore facial-care services, find publicly listed branch information and request your
               preferred appointment in one place.
             </p>
             <div className="buttonRow">
@@ -72,7 +88,7 @@ export default function HomePage() {
             <span>Final descriptions and availability require company confirmation.</span>
           </div>
           <div className="referenceServiceGrid">
-            {services.map((service) => (
+            {featuredServices.map((service) => (
               <article className="referenceServiceCard" key={service.slug}>
                 <div className="referenceServiceImage">
                   <Image
@@ -84,7 +100,7 @@ export default function HomePage() {
                 </div>
                 <div>
                   <h3>{service.name}</h3>
-                  <Link href="/book" aria-label={`Request an appointment for ${service.name}`}>→</Link>
+                  <Link href={`/services/${service.slug}`} aria-label={`View ${service.name}`}>→</Link>
                 </div>
               </article>
             ))}
@@ -101,15 +117,15 @@ export default function HomePage() {
             <div className="referenceBranchIntro">
               <p className="eyebrow">Our branches</p>
               <h2>Find a location near you</h2>
-              <p>Browse confirmed locations through the branch directory.</p>
+              <p>Browse publicly listed locations through the research branch directory.</p>
               <Link className="button buttonCompact" href="/branches">View All Branches</Link>
             </div>
             <div className="referenceBranchCards">
-              {branches.map((branch) => (
-                <Link href="/branches" className="referenceBranchCard" key={branch.slug}>
+              {featuredBranches.map((branch) => (
+                <Link href={`/branches/${branch.slug}`} className="referenceBranchCard" key={branch.slug}>
                   <span aria-hidden="true">⌖</span>
                   <strong>{branch.name}</strong>
-                  <small>{branch.area}</small>
+                  <small>{branch.city}, {branch.province}</small>
                   <em>Details to be confirmed</em>
                 </Link>
               ))}
@@ -155,13 +171,13 @@ export default function HomePage() {
 
           <div className="referenceReasons">
             <div className="compactHeading">
-              <p className="eyebrow">Why this website experience?</p>
-              <h2>Designed around a clearer customer journey</h2>
+              <p className="eyebrow">Plan your visit</p>
+              <h2>How appointment requests work</h2>
             </div>
             <div className="referenceReasonGrid">
-              {websiteReasons.map(([icon, title, description]) => (
+              {appointmentRequestSteps.map(([step, title, description]) => (
                 <div key={title}>
-                  <span aria-hidden="true">{icon}</span>
+                  <span aria-hidden="true">{step}</span>
                   <h3>{title}</h3>
                   <p>{description}</p>
                 </div>
